@@ -1,26 +1,67 @@
 ---
-
 ---
 
 <section>
-  <div class="card dropzone">
-    <div class="inner">
-    </div>
+  <div class="card dropzone dropzone-followers" data-dropzone-followers>
+    <input class="inner" type="file" data-followers-file>
+      <span class="file-name followers-text-file">select your followers file</span>
+    </input>
   </div>
   <div>
 
   </div>
-  <div class="card dropzone">
-    <div class="inner">
-    </div>
+  <div class="card dropzone dropzone-following" data-dropzone-following>
+    <input class="inner" type="file" data-following-file>
+      <span class="file-name following-text-file">select your following file</span>
+    </input>
   </div>
 </section>
+
+<script>
+  const followersFile = document.querySelector('[data-followers-file]');
+  const followingFile = document.querySelector('[data-following-file]');
+
+  const dropzoneFollowers = document.querySelector('[data-dropzone-followers]')
+  const dropzoneFollowing = document.querySelector('[data-dropzone-following]')
+
+
+  followersFile?.addEventListener('change', event => {
+    addFileName(event, 'followers-text-file', 'dropzone-followers')
+  })
+
+  followingFile?.addEventListener('change', event => {
+    addFileName(event, 'following-text-file', 'dropzone-following')
+  })
+
+  function handleDragEvent(event: any, color: string) {
+    event.currentTarget.style.backgroundColor = color;
+  }
+
+  function initializeDropzone(dropzone: any) {
+    dropzone.addEventListener("dragover", (event: any) => handleDragEvent(event, '#EFF2AA'), false);
+    dropzone.addEventListener("dragleave", (event: any) => handleDragEvent(event, 'transparent'), false);
+    dropzone.addEventListener("drop", (event: any) => handleDragEvent(event, 'transparent'), false);
+  }
+
+  initializeDropzone(dropzoneFollowers);
+  initializeDropzone(dropzoneFollowing);
+
+  function addFileName(event: any, elementClass: string, parentName: string){
+    if(event?.target?.files[0]){
+      const textRef = document?.querySelector(`.${elementClass}`)
+      textRef!.textContent = `${event.target.files[0].name}`
+
+      document.querySelector(`.${parentName}`)?.setAttribute('class', 'card dropzone active')
+    }
+  }
+
+</script>
 
 <style>
 	section {
     margin: auto;
     width: 70vw;
-    height: 60vh;
+    height: 40vh;
     background-color: #e1e1e12f;
     border-radius: 30px;
     padding: 30px;
@@ -39,6 +80,11 @@
     background: #323232;
     color: #fff;
     border-radius: 30px;
+    cursor: pointer;
+  }
+
+  .card .inner::-webkit-file-upload-button {
+    visibility: hidden;
   }
 
   .dropzone {
@@ -47,12 +93,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
   }
 
   .dropzone .inner {
     position: relative;
     width: 100%;
+    border: none;
+    color: transparent;
   }
 
   @keyframes rotate {
@@ -80,7 +127,6 @@
     );
     height: 300px;
     width: 200px;
-    transform: translate(0);
     position: absolute;
     animation: rotate 5s linear forwards infinite;
     z-index: 0;
@@ -96,6 +142,21 @@
       rgba(72, 119, 230, 0.75) 50%,
       rgba(255, 255, 255, 0) 100%
     );
+  }
+
+  .active {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(72, 119, 230, 0.75) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  .file-name{
+    position: absolute;
+    font-size: 18px;
+    color: #fff;
   }
 
 </style>
