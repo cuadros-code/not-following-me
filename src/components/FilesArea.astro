@@ -1,18 +1,20 @@
 ---
+import IconFile from "./IconFile.astro";
+
 ---
 
 <section>
   <div class="card dropzone dropzone-followers" data-dropzone-followers>
     <input class="inner" type="file" data-followers-file>
-      <span class="file-name followers-text-file">select your followers file</span>
+      <span class="file-name followers-text-file">Select your followers file</span>
     </input>
   </div>
-  <div>
-
+  <div class="icon">
+    <IconFile />
   </div>
   <div class="card dropzone dropzone-following" data-dropzone-following>
     <input class="inner" type="file" data-following-file>
-      <span class="file-name following-text-file">select your following file</span>
+      <span class="file-name following-text-file">Select your following file</span>
     </input>
   </div>
 </section>
@@ -71,7 +73,13 @@
     padding: 30px;
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: 3fr 1fr 3fr;
+    grid-template-columns: 5fr 1fr 5fr;
+  }
+
+  .icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .card {
@@ -97,8 +105,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* animation: .3s; */
-    transition: 1s;
+    transition: 0.3s;
   }
 
   .dropzone .inner {
