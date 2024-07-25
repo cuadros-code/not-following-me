@@ -56,9 +56,26 @@ import IconFile from "./IconFile.astro";
     if(event?.target?.files[0]){
       const textRef = document?.querySelector(`.${elementClass}`)
       textRef!.textContent = `${event.target.files[0].name}`
-
       document.querySelector(`.${parentName}`)?.setAttribute('class', 'card dropzone active')
+      convertFileToJson(event)
     }
+  }
+
+  function convertFileToJson(event: any){
+    const file = event.target.files[0]
+    const reader = new FileReader()
+
+    reader.onload = function (eventFile) {
+      try {
+        const json = JSON.parse(eventFile.target?.result)
+        console.log(json);
+      } catch (error) {
+        
+      }
+    }; 
+
+    reader.readAsText(file)
+
   }
 
 </script>
@@ -174,6 +191,7 @@ import IconFile from "./IconFile.astro";
     position: absolute;
     font-size: 18px;
     color: #fff;
+    user-select: none;
   }
 
 </style>
