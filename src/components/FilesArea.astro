@@ -2,7 +2,6 @@
 import IconFile from "./IconFile.astro";
 
 ---
-
 <section>
   <div class="card dropzone dropzone-followers" data-dropzone-followers>
     <input class="inner" type="file" data-followers-file>
@@ -20,6 +19,10 @@ import IconFile from "./IconFile.astro";
 </section>
 
 <script>
+  import type { Followers } from "../interfaces/followers.interface" 
+  import type { Following } from "../interfaces/following.interface" 
+  import { FileDropzone, DropzoneAction } from "../enums/dropzone.enum" 
+
   const followersFile = document.querySelector('[data-followers-file]');
   const followingFile = document.querySelector('[data-following-file]');
 
@@ -28,57 +31,60 @@ import IconFile from "./IconFile.astro";
 
 
   followersFile?.addEventListener('change', event => {
-    addFileName(event, 'followers-text-file', 'dropzone-followers')
+    addFileName(event, 'followers-text-file', FileDropzone.FOLLOWERS)
   })
 
   followingFile?.addEventListener('change', event => {
-    addFileName(event, 'following-text-file', 'dropzone-following')
+    addFileName(event, 'following-text-file', FileDropzone.FOLLOWING)
   })
 
-  function handleDragEvent(event: any, action: string) {
-    if (action === 'add') {
+  function handleDragEvent(event: any, action: DropzoneAction) {
+    if (action === DropzoneAction.ADD) {
       event.currentTarget.classList.add('hoverEvent');
-    } else if (action === 'remove') {
+    } else if (action === DropzoneAction.REMOVE) {
       event.currentTarget.classList.remove('hoverEvent');
     }
   }
 
-  function initializeDropzone(dropzone: Element) {
-    dropzone.addEventListener("dragover", (event: Event) => handleDragEvent(event, 'add'), false);
-    dropzone.addEventListener("dragleave", (event: Event) => handleDragEvent(event, 'remove'), false);
-    dropzone.addEventListener("drop", (event: Event) => handleDragEvent(event, 'remove'), false);
+  function initializeDropzone(dropzone: Element | null) {
+    dropzone?.addEventListener("dragover", (event: Event) => handleDragEvent(event, DropzoneAction.ADD), false);
+    dropzone?.addEventListener("dragleave", (event: Event) => handleDragEvent(event, DropzoneAction.REMOVE), false);
+    dropzone?.addEventListener("drop", (event: Event) => handleDragEvent(event, DropzoneAction.REMOVE), false);
   }
 
   initializeDropzone(dropzoneFollowers);
   initializeDropzone(dropzoneFollowing);
 
-  function addFileName(event: any, elementClass: string, parentName: string){
+  function addFileName(event: any, elementClass: string, parentName: FileDropzone){
     if(event?.target?.files[0]){
       const textRef = document?.querySelector(`.${elementClass}`)
       textRef!.textContent = `${event.target.files[0].name}`
       document.querySelector(`.${parentName}`)?.setAttribute('class', 'card dropzone active')
-      convertFileToJson(event)
+      convertFileToJson(event, parentName)
     }
   }
 
-  function convertFileToJson(event: any){
+  function convertFileToJson(event: any, parent: FileDropzone){
     const file = event.target.files[0]
     const reader = new FileReader()
 
-    reader.onload = function (eventFile) {
+    reader.onload = function (eventFile: any) {
       try {
-        const json = JSON.parse(eventFile.target?.result)
-        console.log(json);
+        if(parent === FileDropzone.FOLLOWERS){
+          const json = JSON.parse(eventFile.target.result) as Followers[]
+        } else if (parent === FileDropzone.FOLLOWING){
+          const json = JSON.parse(eventFile.target.result) as Following[]
+        }
       } catch (error) {
         
       }
     }; 
-
     reader.readAsText(file)
-
   }
 
 </script>
+
+
 
 <style>
 	section {
