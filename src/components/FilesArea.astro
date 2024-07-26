@@ -2,7 +2,7 @@
 import IconFile from "./IconFile.astro";
 
 ---
-<section>
+<section class="dropzone-container">
   <div class="card dropzone dropzone-followers" data-dropzone-followers>
     <input class="inner" type="file" data-followers-file>
       <span class="file-name followers-text-file">Select your followers file</span>
@@ -17,10 +17,13 @@ import IconFile from "./IconFile.astro";
     </input>
   </div>
 </section>
+<section class="resume-files">
+
+</section>
 
 <script>
   import type { Followers } from "../interfaces/followers.interface" 
-  import type { Following } from "../interfaces/following.interface" 
+  import type { Following, FollowingContent } from "../interfaces/following.interface" 
   import { FileDropzone, DropzoneAction } from "../enums/dropzone.enum" 
 
   const followersFile = document.querySelector('[data-followers-file]');
@@ -28,6 +31,9 @@ import IconFile from "./IconFile.astro";
 
   const dropzoneFollowers = document.querySelector('[data-dropzone-followers]')
   const dropzoneFollowing = document.querySelector('[data-dropzone-following]')
+
+  let listFollowers: Followers[] = []
+  let listFollowing: Following[] = []
 
 
   followersFile?.addEventListener('change', event => {
@@ -71,12 +77,14 @@ import IconFile from "./IconFile.astro";
     reader.onload = function (eventFile: any) {
       try {
         if(parent === FileDropzone.FOLLOWERS){
-          const json = JSON.parse(eventFile.target.result) as Followers[]
+          const jsonFollowers = JSON.parse(eventFile.target.result) as Followers[]
+          listFollowers = jsonFollowers
         } else if (parent === FileDropzone.FOLLOWING){
-          const json = JSON.parse(eventFile.target.result) as Following[]
+          const jsonFollowing = JSON.parse(eventFile.target.result) as FollowingContent
+          listFollowing = jsonFollowing.relationships_following
         }
       } catch (error) {
-        
+        alert('Error al procesar los archivos')
       }
     }; 
     reader.readAsText(file)
@@ -87,16 +95,26 @@ import IconFile from "./IconFile.astro";
 
 
 <style>
-	section {
+	.dropzone-container {
     margin: auto;
     width: 70vw;
     height: 40vh;
+    max-width: 900px;
     background-color: #e1e1e12f;
     border-radius: 30px;
     padding: 30px;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: 5fr 1fr 5fr;
+  }
+
+  .resume-files{
+    margin: 10px auto;
+    border-radius: 30px;
+    max-width: 900px;
+    width: 70vw;
+    height: 20vh;
+    background-color: #e1e1e12f;
   }
 
   .icon{

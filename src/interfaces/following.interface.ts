@@ -1,8 +1,8 @@
-export interface Following {
-  relationships_following: RelationshipsFollowing[];
+export interface FollowingContent {
+  relationships_following: Following[];
 }
 
-interface RelationshipsFollowing {
+export interface Following {
   title:            string;
   media_list_data:  any[];
   string_list_data: StringListDatum[];
