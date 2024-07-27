@@ -1,6 +1,5 @@
 ---
 import IconFile from "./IconFile.astro";
-
 ---
 <section class="dropzone-container">
   <div class="card dropzone dropzone-followers" data-dropzone-followers>
@@ -17,14 +16,15 @@ import IconFile from "./IconFile.astro";
     </input>
   </div>
 </section>
-<section class="resume-files">
-
-</section>
+<div class="button-container">
+  <button id="process-action" class="styled-button">Process</button>
+</div>
 
 <script>
   import type { Followers } from "../interfaces/followers.interface" 
   import type { Following, FollowingContent } from "../interfaces/following.interface" 
-  import { FileDropzone, DropzoneAction } from "../enums/dropzone.enum" 
+  import { FileDropzone, DropzoneAction } from "../enums/dropzone.enum"
+  import { getNotFollowingMe } from '../utils/compare-arrays'
 
   const followersFile = document.querySelector('[data-followers-file]');
   const followingFile = document.querySelector('[data-following-file]');
@@ -32,16 +32,20 @@ import IconFile from "./IconFile.astro";
   const dropzoneFollowers = document.querySelector('[data-dropzone-followers]')
   const dropzoneFollowing = document.querySelector('[data-dropzone-following]')
 
+  const button = document.getElementById('process-action')
+
   let listFollowers: Followers[] = []
   let listFollowing: Following[] = []
 
+  button?.addEventListener('click', processUserList)
+
 
   followersFile?.addEventListener('change', event => {
-    addFileName(event, 'followers-text-file', FileDropzone.FOLLOWERS)
+    addFileName(event, FileDropzone.FOLLOWERS)
   })
 
   followingFile?.addEventListener('change', event => {
-    addFileName(event, 'following-text-file', FileDropzone.FOLLOWING)
+    addFileName(event, FileDropzone.FOLLOWING)
   })
 
   function handleDragEvent(event: any, action: DropzoneAction) {
@@ -61,10 +65,8 @@ import IconFile from "./IconFile.astro";
   initializeDropzone(dropzoneFollowers);
   initializeDropzone(dropzoneFollowing);
 
-  function addFileName(event: any, elementClass: string, parentName: FileDropzone){
+  function addFileName(event: any, parentName: FileDropzone){
     if(event?.target?.files[0]){
-      const textRef = document?.querySelector(`.${elementClass}`)
-      textRef!.textContent = `${event.target.files[0].name}`
       document.querySelector(`.${parentName}`)?.setAttribute('class', 'card dropzone active')
       convertFileToJson(event, parentName)
     }
@@ -77,10 +79,14 @@ import IconFile from "./IconFile.astro";
     reader.onload = function (eventFile: any) {
       try {
         if(parent === FileDropzone.FOLLOWERS){
+          const textRef = document?.querySelector(`.followers-text-file`)
           const jsonFollowers = JSON.parse(eventFile.target.result) as Followers[]
+          textRef!.innerHTML = `${jsonFollowers.length} <br/> Followers`
           listFollowers = jsonFollowers
         } else if (parent === FileDropzone.FOLLOWING){
+          const textRef = document?.querySelector(`.following-text-file`)
           const jsonFollowing = JSON.parse(eventFile.target.result) as FollowingContent
+          textRef!.innerHTML = `${jsonFollowing.relationships_following.length} <br/> Following`
           listFollowing = jsonFollowing.relationships_following
         }
       } catch (error) {
@@ -88,6 +94,15 @@ import IconFile from "./IconFile.astro";
       }
     }; 
     reader.readAsText(file)
+  }
+
+  function processUserList(){
+    if(listFollowers.length && listFollowing.length){
+      const notFollowersList: Followers[] = getNotFollowingMe(listFollowers, listFollowing)
+      
+    } else {
+      alert('Agrege los archivos necesarios')
+    }
   }
 
 </script>
@@ -98,23 +113,68 @@ import IconFile from "./IconFile.astro";
 	.dropzone-container {
     margin: auto;
     width: 70vw;
-    height: 40vh;
+    height: 30vh;
     max-width: 900px;
-    background-color: #e1e1e12f;
-    border-radius: 30px;
-    padding: 30px;
-    box-sizing: border-box;
     display: grid;
     grid-template-columns: 5fr 1fr 5fr;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 4px;
+    position: relative;
   }
 
-  .resume-files{
-    margin: 10px auto;
-    border-radius: 30px;
-    max-width: 900px;
-    width: 70vw;
-    height: 20vh;
-    background-color: #e1e1e12f;
+  .dropzone-container::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    border: 2px solid #cecece;
+    border-radius: 3px;
+  }
+
+  .button-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+  }
+
+  .styled-button {
+    display: block;
+    padding: 10px 30px;
+    font-size: 24px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    cursor: pointer;
+    outline: none;
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 0 #0616ce;
+    position: relative;
+    transition: box-shadow .13s ease;
+    font-family: 'Poppins', sans-serif;
+  }
+  .styled-button::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    bottom: 3px;
+    left: 3px;
+    border: 2px solid #cecece;
+    border-radius: 3px;
+  }
+  
+  .styled-button:hover {
+    box-shadow: 5px 5px 0 0 #2f2dad;
+  }
+  .styled-button::before:hover {
+      border-width: 1px;
+  }
+  .styled-button:active {
+    box-shadow: 1px 1px 0 0 #3533be;
   }
 
   .icon{
@@ -125,14 +185,38 @@ import IconFile from "./IconFile.astro";
 
   .card {
     height: 100%;
-    border-radius: 30px;
+    padding: 0px 0px;
+    font-size: 24px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    cursor: pointer;
+    outline: none;
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 0 #000000;
+    position: relative;
+    transition: box-shadow .13s ease;
+    font-family: 'Poppins', sans-serif;
+  }
+ 
+  .card::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+    left: 5px;
+    border: 2px solid #cecece;
+    border-radius: 3px;
   }
 
+  .card.active{
+    box-shadow: 5px 5px 0 0 #2fe20258;
+  }
+  
+
   .card .inner {
-    height: calc(100% - 8px);
-    background: #323232;
-    color: #fff;
-    border-radius: 30px;
+    height: 100%;
     cursor: pointer;
   }
 
@@ -156,66 +240,16 @@ import IconFile from "./IconFile.astro";
     color: transparent;
   }
 
-  @keyframes rotate {
-    from {
-      transform: rotate(0);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .dropzone .inner {
-    margin: 5px;
-  }
-
-  .dropzone::before {
-    content: "";
-    display: block;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(102, 102, 102, 0.75) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    height: 300px;
-    width: 200px;
-    position: absolute;
-    animation: rotate 5s linear forwards infinite;
-    z-index: 0;
-    top: 50%;
-    transform-origin: top center;
-    transition: 0.5s;
-  }
-
-  .dropzone:hover::before {
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(72, 119, 230, 0.75) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  }
-
-  .active {
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(72, 230, 85, 0.563) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  }
-
   .hoverEvent {
-    transform: scale(1.1);
+    transform: scale(1.04);
   }
 
   .file-name{
     position: absolute;
     font-size: 18px;
-    color: #fff;
+    color: #000;
     user-select: none;
+    text-align: center;
   }
 
 </style>
