@@ -20,12 +20,12 @@ import IconFile from "./IconFile.astro";
   <button id="process-action" class="styled-button">Compare</button>
 </section>
 
-<h3 class="title-result">Who doesn't follow me</h3>
-<section class="list-results">
-  <ul class="list">
-
-  </ul>
-</section>
+<div class="result-container">
+  <h3 class="title-result">Who doesn't follow me</h3>
+  <section class="list-results">
+    <ul class="list"></ul>
+  </section>
+</div>
 
 <script>
   import type { Followers } from "../interfaces/followers.interface" 
@@ -40,6 +40,8 @@ import IconFile from "./IconFile.astro";
   const dropzoneFollowing = document.querySelector('[data-dropzone-following]')
 
   const button = document.getElementById('process-action')
+
+  const resultContainer = document.querySelector('.result-container')
 
   let listFollowers: Followers[] = []
   let listFollowing: Following[] = []
@@ -105,12 +107,17 @@ import IconFile from "./IconFile.astro";
 
   function processUserList(){
     if(listFollowers.length && listFollowing.length){
+      resultContainer?.classList.add('visible')
       const notFollowersList: Followers[] = getNotFollowingMe(listFollowers, listFollowing)
-
       const ul = document.querySelector('.list')
       for (const notFollower of notFollowersList) {
-        let li = document.createElement('li')
-        li.appendChild(document.createTextNode(`${notFollower.string_list_data[0].href}`))
+        const li = document.createElement('li')
+        const link = document.createElement('a')
+        link.target = '_blank'
+        link.rel = 'noopener noreferrer'
+        link.href = notFollower.string_list_data[0].href
+        link.textContent = notFollower.string_list_data[0].href
+        li.appendChild(link)
         ul?.appendChild(li)
       }
       
@@ -125,7 +132,7 @@ import IconFile from "./IconFile.astro";
 <style>
 	.dropzone-container {
     margin: auto;
-    height: 30vh;
+    height: 40vh;
     width: 900px;
     display: grid;
     grid-template-columns: 5fr 1fr 5fr;
@@ -296,6 +303,23 @@ import IconFile from "./IconFile.astro";
 
   .list {
     color: #000;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 25px;
+    row-gap: 5px;
+    padding: 30px;
+    list-style: none;
+    font-size: 16px;
+    position: relative;
+    z-index: 99;
+  }
+
+  .result-container{
+    visibility: hidden;
+  }
+
+  .result-container.visible {
+    visibility: visible;
   }
 
 </style>
