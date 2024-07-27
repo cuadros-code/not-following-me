@@ -110,6 +110,7 @@ import IconFile from "./IconFile.astro";
       resultContainer?.classList.add('visible')
       const notFollowersList: Followers[] = getNotFollowingMe(listFollowers, listFollowing)
       const ul = document.querySelector('.list')
+      ul!.innerHTML = ""
       for (const notFollower of notFollowersList) {
         const li = document.createElement('li')
         const link = document.createElement('a')
