@@ -17,11 +17,14 @@ import IconFile from "./IconFile.astro";
   </div>
 </section>
 <section class="button-container">
-  <button id="process-action" class="styled-button">Process</button>
+  <button id="process-action" class="styled-button">Compare</button>
 </section>
 
 <h3 class="title-result">Who doesn't follow me</h3>
 <section class="list-results">
+  <ul class="list">
+
+  </ul>
 </section>
 
 <script>
@@ -103,6 +106,13 @@ import IconFile from "./IconFile.astro";
   function processUserList(){
     if(listFollowers.length && listFollowing.length){
       const notFollowersList: Followers[] = getNotFollowingMe(listFollowers, listFollowing)
+
+      const ul = document.querySelector('.list')
+      for (const notFollower of notFollowersList) {
+        let li = document.createElement('li')
+        li.appendChild(document.createTextNode(`${notFollower.string_list_data[0].href}`))
+        ul?.appendChild(li)
+      }
       
     } else {
       alert('Agrege los archivos necesarios')
@@ -282,6 +292,10 @@ import IconFile from "./IconFile.astro";
     margin: 80px 0px 5px 0px;
     line-height: 50px;
     font-size: 40px;
+  }
+
+  .list {
+    color: #000;
   }
 
 </style>
